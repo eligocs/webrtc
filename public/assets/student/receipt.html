@@ -1,0 +1,381 @@
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <!-- <title>{{ $invoice->invoice_number }}</title> -->
+    <style>
+
+        .clearfix:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        a {
+            color: #0087C3;
+            text-decoration: none;
+        }
+
+        body {
+            position: relative;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            color: #555555;
+            background: #FFFFFF;
+            font-size: 14px;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+        }
+
+        h2 {
+            font-weight:normal;
+        }
+
+        header {
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #AAAAAA;
+        }
+
+        #logo {
+            float: left;
+            margin-top: 11px;
+        }
+
+        #logo img {
+            height: 55px;
+            margin-bottom: 15px;
+        }
+
+        #company {
+
+        }
+
+        #details {
+            margin-bottom: 50px;
+        }
+
+        #client {
+            padding-left: 6px;
+            float: left;
+        }
+
+        #client .to {
+            color: #777777;
+        }
+
+        h2.name {
+            font-size: 1.2em;
+            font-weight: normal;
+            margin: 0;
+        }
+
+        #invoice {
+
+        }
+
+        #invoice h1 {
+            color: #0087C3;
+            font-size: 2.4em;
+            line-height: 1em;
+            font-weight: normal;
+            margin: 0 0 10px 0;
+        }
+
+        #invoice .date {
+            font-size: 1.1em;
+            color: #777777;
+        }
+
+        table {
+            width: 100%;
+            border-spacing: 0;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+            padding: .9rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        table th {
+            white-space: nowrap;
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            background-color: #ffffff;
+            font-size: 15px !important;
+            font-weight: 700;
+        }
+
+        table td {
+            text-align: right;
+        }
+
+        table .no {
+            color: #555555;
+            width: 10%;
+        }
+
+        table .desc {
+            text-align: left;
+        }
+
+
+        table td.unit,
+        table td.qty,
+        table td.total
+        {
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        table td.unit{
+            width: 35%;
+        }
+
+        table td.desc{
+            width: 45%;
+        }
+
+        table td.qty{
+            width: 5%;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 1px 8px 5px;
+            font-size: 1.3em;
+            width: 80px;
+            color: #fff;
+            float: right;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .status.unpaid {
+            background-color: #E7505A;
+        }
+        .status.paid {
+            background-color: #26C281;
+        }
+        .status.cancelled {
+            background-color: #95A5A6;
+        }
+        .status.error {
+            background-color: #F4D03F;
+        }
+
+        table tr.tax .desc {
+            text-align: right;
+            color: #1BA39C;
+        }
+        table tr.discount .desc {
+            text-align: right;
+            color: #E43A45;
+        }
+        table tr.subtotal .desc {
+            text-align: right;
+            color: #1d0707;
+        }
+        table tbody tr:last-child td {
+            border: none;
+        }
+
+        table tfoot td {
+            padding: 10px 10px 20px 10px;
+            background: #FFFFFF;
+            border-bottom: none;
+            font-size: 1.2em;
+            white-space: nowrap;
+            border-bottom: 1px solid #ededed;
+        }
+
+        table tfoot tr:first-child td {
+            border-top: none;
+        }
+
+        table tfoot tr td:first-child {
+            border: none;
+        }
+
+        #thanks {
+            font-size: 2em;
+            margin-bottom: 50px;
+        }
+
+    
+
+        footer {
+            color: #777777;
+            width: 100%;
+            height: 30px;
+            position: absolute;
+            bottom: 0;
+            border-top: 1px solid #AAAAAA;
+            padding: 8px 0;
+            text-align: center;
+        }
+
+        table.billing td {
+            background-color: #fff;
+        }
+
+        table td div#invoiced_to {
+            text-align: left;
+        }
+
+        #notes{
+            color: #767676;
+            font-size: 11px;
+        }
+        h3 {
+            margin: 10px 0;
+            font-weight: 600;
+            color: #343a40;
+            font-size: 1.5rem;
+        }
+        hr{
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border: 0;
+            border-top: 1px solid #ededed;
+        }
+        h4{
+            margin: 10px 0;
+            font-weight: 600;
+            color: #343a40;
+            font-size: 1.125rem;
+        }
+        address,p {
+            margin: 0;
+            font-style: normal;
+            line-height: 1.4;
+            font-size: 15px;
+        }
+        h5 {
+            font-size: 14px;
+            margin: 10px 0 13px;
+        }
+        small {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body style="background-color: #E6E6E6;font-family: Karla,sans-serif;">
+<div style="padding:50px;background-color: #fff;width:70%; margin:25px auto">
+    <table cellpadding="0" cellspacing="0" class="billing">
+        <tr>
+            <td>
+                <div id="invoiced_to">
+                    <!-- <small>Twitter, Inc.</small> -->
+                    <h3 class="name">AVESTUD</h3>
+                </div>
+            </td>
+            <td>
+                <div id="company">
+                    <h4>Invoice #</br>2016-04-23654789</h3>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <table cellpadding="0" cellspacing="0" class="billing">
+        <tr>
+            <td>
+                <div id="invoiced_to">
+                    <address><strong>Twitter, Inc.</strong></br>
+                     795 Folsom Ave, Suite 600</br>
+                        San Francisco, CA 94107</br>
+                        P: (123) 456-7890</address>
+                </div>
+            </td>
+            <td>
+                <div id="deate">
+                    <p><strong>Order Date: </strong> Jan 17, 2016</p>
+                    <p class="m-t-10"><strong>Order Status: </strong> <span class="label label-pink">Pending</span></p>
+                    <p class="m-t-10"><strong>Order ID: </strong> #123456</p>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <main>
+        <table border="0" cellspacing="0" cellpadding="0">
+            <thead>
+            <tr>
+                <th style="text-align: left;">#</th>
+                <th style="text-align: left;">Item</th>
+                <th style="text-align: left;">Description</th>
+                <th style="text-align: left;">Quantity</th>
+                <th style="text-align: left;">Unit Cost</th>
+                <th style="text-align: left;">Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr style="page-break-inside: avoid;">
+                <td  >1</td>
+                <td  >LCD</td>
+                <td  >Lorem ipsum dolor sit amet.</td>
+                <td  >1</td>
+                <td  >&#8377; 380</td>
+                <td  >&#8377; 380</td>
+            </tr>
+            <tr style="page-break-inside: avoid;">
+                <td  >2</td>
+                <td  >LCD</td>
+                <td  >Lorem ipsum dolor sit amet.</td>
+                <td  >1</td>
+                <td  >&#8377; 380</td>
+                <td  >&#8377; 380</td>
+            </tr>
+            <tr style="page-break-inside: avoid;">
+                <td  >3</td>
+                <td  >LCD</td>
+                <td  >Lorem ipsum dolor sit amet.</td>
+                <td  >1</td>
+                <td  >&#8377; 380</td>
+                <td  >&#8377; 380</td>
+            </tr>
+            <tr style="page-break-inside: avoid;">
+                <td  >4</td>
+                <td  >LCD</td>
+                <td  >Lorem ipsum dolor sit amet.</td>
+                <td  >1</td>
+                <td  >&#8377; 380</td>
+                <td  >&#8377; 380</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr dontbreak="true">
+                <td colspan="3" >
+                    <div class="clearfix mt-4" style="text-align: left; width:90%">
+                        <h5 class="small text-dark">PAYMENT TERMS AND POLICIES</h5>
+
+                        <small style="white-space: normal;">
+                            All accounts are to be paid within 7 days from receipt of
+                            invoice. To be paid by cheque or credit card or direct payment
+                            online. If account is not paid within 7 days the credits details
+                            supplied as confirmation of work undertaken will be charged the
+                            agreed quoted fee noted above.
+                        </small>
+                    </div>
+                </td>
+                <td colspan="3">
+                    <p class="text-right"><b>Sub-total:</b> 2930.00</p>
+                    <p class="text-right">Discout: 12.9%</p>
+                    <p class="text-right">VAT: 12.9%</p>
+                    <hr>
+                    <h3 class="text-right">&#8377; 2930.00</h3>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <p>&nbsp;</p>
+    
+    </main>
+    </div>
+</body>
+</html>

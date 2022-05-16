@@ -1,0 +1,92 @@
+<?php
+
+
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('login', 'Auth\AuthController@login');
+    Route::post('register_student', 'Auth\AuthController@register_student');
+    Route::post('forgotAction', 'Auth\AuthController@forgotAction');
+    Route::post('register', 'Auth\AuthController@register');
+    Route::post('updatepassword', 'Auth\AuthController@updatepassword');
+    Route::get('logout', 'Auth\AuthController@logout');
+    Route::post('resendOtp', 'Auth\AuthController@resendOtp');
+    Route::get('institute', 'Api\v1\Front\InstituteController@index');
+    Route::group(['middleware' => 'auth:api'], function () {
+        //institute
+        Route::post('inst_detail', 'Api\v1\Front\InstituteController@inst_detail');
+        Route::post('lectures', 'Api\v1\Front\InstituteController@lectures');
+        Route::post('getClassunits', 'Api\v1\Front\InstituteController@getClassunits');
+        Route::post('createLecture', 'Api\v1\Front\InstituteController@createLecture');
+        Route::post('enrollments', 'Api\v1\Front\InstituteController@enrollments');
+        Route::post('delLecture', 'Api\v1\Front\InstituteController@delLecture');
+        Route::post('delExtraClass', 'Api\v1\Front\InstituteController@delExtraClass');
+        Route::post('getLecture', 'Api\v1\Front\InstituteController@getLecture');
+        Route::post('getExtraClass', 'Api\v1\Front\InstituteController@getExtraClass');
+        Route::post('creatnotify', 'Api\v1\Front\InstituteController@creatnotify');
+        Route::post('extraclass', 'Api\v1\Front\InstituteController@extraclass');
+        Route::post('createExtraclass', 'Api\v1\Front\InstituteController@createExtraclass');
+        Route::post('getAssignments', 'Api\v1\Front\InstituteController@getAssignments');
+        Route::post('createAssignments', 'Api\v1\Front\InstituteController@createAssignments');
+        Route::post('getAssignmentunits', 'Api\v1\Front\InstituteController@getAssignmentunits');
+        Route::post('getTestunits', 'Api\v1\Front\InstituteController@getTestunits');
+        Route::post('getSAssigment', 'Api\v1\Front\InstituteController@getSAssigment');
+        Route::post('getSQuestion', 'Api\v1\Front\InstituteController@getSQuestion');
+        Route::post('delAssignments', 'Api\v1\Front\InstituteController@delAssignments');
+        Route::post('delQuestion', 'Api\v1\Front\InstituteController@delQuestion');
+        Route::post('gettest', 'Api\v1\Front\InstituteController@gettest');
+        Route::post('createTest', 'Api\v1\Front\InstituteController@createTest');
+        Route::post('delTest', 'Api\v1\Front\InstituteController@deLtest');
+        Route::post('addtestUnit', 'Api\v1\Front\InstituteController@addtestUnit');
+        Route::post('doubts', 'Api\v1\Front\InstituteController@doubts');
+        Route::post('getTests', 'Api\v1\Front\InstituteController@getTests');
+        Route::post('addAssignmentQuestion', 'Api\v1\Front\InstituteController@addAssignmentQuestion');
+        Route::post('getQuestions', 'Api\v1\Front\InstituteController@getQuestions');
+        Route::post('createAssigmentUnit', 'Api\v1\Front\InstituteController@createAssigmentUnit');
+        Route::post('createTestUnit', 'Api\v1\Front\InstituteController@createTestUnit');
+        Route::post('deltest', 'Api\v1\Front\InstituteController@deltest');
+        Route::post('publishAssigment', 'Api\v1\Front\InstituteController@publishAssigment');
+        Route::post('loadDoubts', 'Api\v1\Front\InstituteController@loadDoubts');
+        Route::post('loadsingleDoubt', 'Api\v1\Front\InstituteController@loadsingleDoubt');
+        Route::post('senddoubt', 'Api\v1\Front\InstituteController@senddoubt');
+        Route::post('generate_receipt', 'Api\v1\Front\InstituteController@generate_receipt');
+        Route::post('createLectureUnit', 'Api\v1\Front\InstituteController@createLectureUnit');
+        Route::post('saveSyllabus', 'Api\v1\Front\InstituteController@saveSyllabus');
+        Route::post('updateVideo', 'Api\v1\Front\InstituteController@updateVideo');
+        Route::post('updateDemoVideo', 'Api\v1\Front\InstituteController@updateDemoVideo');
+        Route::get('profile', 'Api\v1\Front\InstituteController@profile');
+        Route::post('getStudentSubjects', 'Api\v1\Front\InstituteController@getStudentSubjects');
+        Route::post('getstudentAttendance', 'Api\v1\Front\InstituteController@getstudentAttendance');
+
+        //student
+        Route::post('getstudentsubject', 'Api\v1\Front\StudentController@getstudentsubject');
+        Route::get('studenthome', 'Api\v1\Front\StudentController@index');
+        Route::get('getcats', 'Api\v1\Front\StudentController@getcats');
+        Route::post('getstudentclass', 'Api\v1\Front\StudentController@getstudentclass');
+        Route::post('loadstudentdata', 'Api\v1\Front\StudentController@loadstudentdata');
+        Route::post('enrollclass', 'Api\v1\Front\StudentController@enrollclass');
+        Route::post('enrollthisclass', 'Api\v1\Front\StudentController@enrollthisclass');
+        Route::post('paynow', 'Api\v1\Front\StudentController@paynow');
+        Route::post('verifyPayment', 'Api\v1\Front\StudentController@verifyPayment');
+        Route::post('apply_coupon', 'Api\v1\Front\StudentController@apply_coupon');
+        Route::post('getstudentAssignment', 'Api\v1\Front\StudentController@getstudentAssignment');
+        Route::post('startassignment', 'Api\v1\Front\StudentController@startassignment');
+        Route::post('storeAnswer', 'Api\v1\Front\StudentController@storeAnswer');
+        Route::post('loadstudentDoubt', 'Api\v1\Front\StudentController@loadstudentDoubt');
+        Route::post('add_doubt', 'Api\v1\Front\StudentController@add_doubt');
+        Route::post('send_btn', 'Api\v1\Front\StudentController@send_btn');
+        Route::post('getstudentextraclass', 'Api\v1\Front\StudentController@getstudentextraclass');
+        Route::post('getSTests', 'Api\v1\Front\StudentController@getSTests');
+        Route::post('getnotification', 'Api\v1\Front\StudentController@getnotification');
+        Route::post('readnotification', 'Api\v1\Front\StudentController@readnotification');
+        Route::post('mark_an_attendence', 'Api\v1\Front\StudentController@mark_an_attendence');
+        Route::post('updateprofile', 'Api\v1\Front\StudentController@updateprofile');
+        Route::post('saveAnswer', 'Api\v1\Front\StudentController@saveAnswer');
+        Route::post('finishAssign', 'Api\v1\Front\StudentController@finishAssign');
+        Route::post('getReport', 'Api\v1\Front\StudentController@getReport');
+        Route::post('resettest', 'Api\v1\Front\StudentController@resettest');
+        Route::post('getTimings', 'Api\v1\Front\StudentController@getTimings');
+        Route::post('editClassTime', 'Api\v1\Front\StudentController@editClassTime');
+        Route::get('loadRecipts', 'Api\v1\Front\StudentController@loadRecipts');
+        Route::post('getstudents', 'Api\v1\Front\StudentController@getstudents');
+        Route::post('generate_student_receipt', 'Api\v1\Front\StudentController@generate_student_receipt');
+    });
+});
