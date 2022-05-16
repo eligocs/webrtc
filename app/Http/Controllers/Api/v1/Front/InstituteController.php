@@ -217,6 +217,7 @@ class InstituteController extends Controller
                 'i_a_c_s_id' => $i_a_c_s_id,
                 'syllabus' => $syl,
                 'video' => $vid,
+                'videoapproval' => $iacs->videoApproval ?? '0',
                 'next_class' => $next_class ?? '',
                 'class_time' => $class_time,
                 'studentcount' => $studentcount,
@@ -1952,18 +1953,18 @@ class InstituteController extends Controller
         $i_assigned_class = request()->i_assigned_class;
         $institute_class_subject = request()->i_assigned_class_subject_id;
         if (request()->hasFile('syllabus')) {
-            $folderName = 'institutes/subjectvideo'. '/'.auth()->user()->institute_id . '/' . $i_assigned_class . '/' .$institute_class_subject;
-            return $folderName;
+            $folderName = 'institutes/subjectvideo'. '/'.auth()->user()->institute_id . '/' . $i_assigned_class . '/' .$institute_class_subject; 
             $folder = createFolder($folderName);
             $fileData = request()->file('syllabus');
             $file = createUrlsession($fileData, $folder);
             $file_name = '';
             if (!empty($file) && $file != 400) {
                 $file_name = serialize($file);
-            }
-            $institute_assigned_class = \App\Models\InstituteAssignedClass::findOrFail($institute_class);
-            $institute_assigned_class->video = $file_name;
-            $institute_assigned_class->save();
+            } 
+            $s = \App\Models\InstituteAssignedClassSubject::where('id', $institute_class_subject)->update([
+                'video' => $file_name, 
+                'videoApproval' => 0,
+            ]);
             return response()->json([
                 'status' => 200,
                 'msg' => 'Video updated successfully',

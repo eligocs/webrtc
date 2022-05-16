@@ -256,7 +256,7 @@ class StudentController extends Controller
                     }
                 }
                 $class->subjects = $subjects;
-                $class->insvideo = !empty($class->institute_details->video) && @unserialize($class->institute_details->video) ? unserialize($class->institute_details->video)[0] : '';
+                $class->insvideo = !empty($class->institute_details->video) && @unserialize($class->institute_details->video) && $class->institute_details->videoApproval == 1 ? unserialize($class->institute_details->video)[0] : '';
             }
         }
 
@@ -286,7 +286,7 @@ class StudentController extends Controller
         $iacs = \App\Models\InstituteAssignedClassSubject::findOrFail(request()->iacs);
         $iac = $iacs->institute_assigned_class;
         $syllabus = $iacs->syllabus ?? '';
-        $videoClass = $iac->video ?? '';
+        $videoClass = $iacs->video ?? '';
         $getSubjectsInfo = \App\Models\SubjectsInfo::where('institute_assigned_class_subject_id', request()->iacs)->get();
         $class_days = [];
         $class_time = [];
@@ -367,7 +367,7 @@ class StudentController extends Controller
             $syl = $syllabus[0];
         }
         $vid = '';
-        if (!empty($videoClass) && @unserialize($videoClass) == true) {
+        if (!empty($videoClass) && @unserialize($videoClass) == true && $iacs->videoApproval == 1) {
             $videoClass = unserialize($videoClass);
             $vid = $videoClass[0];
         }
