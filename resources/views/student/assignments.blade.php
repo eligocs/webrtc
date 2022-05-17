@@ -62,7 +62,7 @@ ul.topic-detail li {
     <div>{{ Breadcrumbs::render('student_assignments', request()->iacs_id) }}</div>
     <div class="quiz-main-block">
         <div class="row">
-            @php
+          <?php
 
             $total2 = 0;
             $items2 = [];
@@ -72,20 +72,20 @@ ul.topic-detail li {
             ->where('type', 'assignment')
             ->get();
             if (!empty($assignmentnotifications)) {
-            foreach ($assignmentnotifications as $noti) {
-            if ($noti->readUsers) {
-            $hiddenProducts = explode(',', $noti->readUsers);
-            if (in_array(auth()->user()->student_id, $hiddenProducts)) {
-            $total2 = $total2 + 0;
-            } else {
-            $total2 = $total2 + 1;
-            $items2[] = $noti->assigment_id;
-            }
-            } else {
-            $total2 = $total2 + 1;
-            $items2[] = $noti->assigment_id;
-            }
-            }
+                foreach ($assignmentnotifications as $noti) {
+                    if ($noti->readUsers) {
+                            $hiddenProducts = explode(',', $noti->readUsers);
+                        if (in_array(auth()->user()->student_id, $hiddenProducts)) {
+                            $total2 = $total2 + 0;
+                        } else {
+                            $total2 = $total2 + 1;
+                            $items2[] = $noti->assigment_id;
+                        }
+                    } else {
+                        $total2 = $total2 + 1;
+                        $items2[] = $noti->assigment_id;
+                    }
+                }
             }
             $assignmentnotifications = $total2;
             $assignNotificationData = $items2;
@@ -160,7 +160,7 @@ ul.topic-detail li {
                         }
                         }
                         }
-                        @endphp
+                         ?>
                         @if (!empty($topics))
                         @forelse ($topics as $key => $unit)
                         @if ($unit['topics']->count() > 0)

@@ -41,27 +41,44 @@
         </form>
     </div>
 
-    @php
-
-    $old_data =
-    DB::table('class_notifications')->where('type','extraClass')->where('i_a_c_s_id',request()->iacs_id)->where('notify_date','
-    <=',date('Y-m-d'))->get(); 
-        if ($old_data) {
+   <?php
+    $old_data = DB::table('class_notifications')->where('type','extraClass')->where('i_a_c_s_id',request()->iacs_id)->whereDate('notify_date',' <=',date('Y-m-d'))->get();   
+    if ($old_data) {
         $items2 = [];
         foreach($old_data as $dat){
-        $old_data_arr = !empty($dat->readUsers) ? explode(',',$dat->readUsers) :[];
-        if(!in_array(auth()->user()->student_id , $old_data_arr)) {
-        $items2[] = $dat->class_id ? $dat->class_id : '';
-        $old_data_arr[] = auth()->user()->student_id;
-        $query =
-        DB::table('class_notifications')->where('type','extraClass')->where('i_a_c_s_id',request()->iacs_id)->where('notify_date','
-        <=',date('Y-m-d'))->update([
-            'readUsers'=> implode(',',$old_data_arr),
-            ]);
+            $old_data_arr = !empty($dat->readUsers) ? explode(',',$dat->readUsers) :[];
+            if(!in_array(auth()->user()->student_id , $old_data_arr)) {
+                $items2[] = $dat->class_id ? $dat->class_id : '';
+                $old_data_arr[] = auth()->user()->student_id; 
             }
+        }
+    }
+        /* $total2 = 0;
+        $items2 = [];
+            $assignmentnotifications = DB::table('class_notifications')
+            ->where('i_a_c_s_id', request()->iacs_id)
+            ->whereDate('notify_date',' <=',date('Y-m-d'))
+            ->where('type', 'extraClass')
+            ->get();
+            if (!empty($assignmentnotifications)) {
+                foreach ($assignmentnotifications as $noti) {
+                    if ($noti->readUsers) {
+                            $hiddenProducts = explode(',', $noti->readUsers); 
+                        if (in_array(auth()->user()->student_id, $hiddenProducts)) {
+                            $total2 = $total2 + 0;
+                        } else {
+                            $total2 = $total2 + 1;
+                            $items2[] = $noti->assigment_id;
+                        }
+                    } else {
+                        $total2 = $total2 + 1;
+                        $items2[] = $noti->assigment_id;
+                    }
+                }
             }
-            }
-            @endphp
+            $assignmentnotifications = $total2;
+            $assignNotificationData = $items2;  */
+        ?>
 
             <div class="card-box">
                 <div class="table-responsive">
@@ -83,14 +100,14 @@
             if(!empty($extra_class->notes)){
                 $notesname = unserialize($extra_class->notes);
                 $notes = $notesname[0];
-            }
+            }  
                     ?>
                             <div class="col-md-3 p-1 col-sm-6 col-6">
                                 @if(in_array($extra_class->id, $items2))
                                 <div class="ribbon" style=""><span>New</span></div>
                                 @endif
                                 <div class="{{$colors[$key1%6]}} br-6 px-2 py-3">
-                                    <h4 class=" text-center fw-100 text-white mt-0 mb-1  font-16"><b>Lecture
+                                    <h4 class=" text-center fw-100 text-white mt-0 mb-1  font-16"><b>Lecture  
                                             {{$extra_class->extra_class_number}}</b>
                                     </h4>
                                     <h4 class=" text-center fw-100 text-white mt-0 mb-1  font-16 oneLine"
@@ -131,6 +148,23 @@
                     @endif
                     @endforeach
                 </div>
+                <?php
+                if ($old_data) {
+                    $items2 = [];
+                    foreach($old_data as $dat){
+                        $old_data_arr = !empty($dat->readUsers) ? explode(',',$dat->readUsers) :[];
+                        if(!in_array(auth()->user()->student_id , $old_data_arr)) {
+                            $items2[] = $dat->class_id ? $dat->class_id : '';
+                            $old_data_arr[] = auth()->user()->student_id;
+                            $query =
+                            DB::table('class_notifications')->where('type','extraClass')->where('i_a_c_s_id',request()->iacs_id)->whereDate('notify_date','<=',date('Y-m-d'))
+                                ->update([
+                                    'readUsers'=> implode(',',$old_data_arr),
+                                ]);
+                        }
+                    }
+                }
+                ?>
             </div>
             {{-- <div class="card-box">
     <div class="table-responsive">

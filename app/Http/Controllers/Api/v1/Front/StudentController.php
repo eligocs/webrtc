@@ -145,6 +145,31 @@ class StudentController extends Controller
         $topics = [];
         $unitNames = Test_unit::all();
         $questions = Question::all();
+        $total2 = 0;
+        $items2 = [];
+        $assignmentnotifications = DB::table('class_notifications')
+            ->where('i_a_c_s_id', request()->iacs)
+            ->where('isread', 1)
+            ->where('type', 'test')
+            ->get();
+        if (!empty($assignmentnotifications)) {
+            foreach ($assignmentnotifications as $noti) {
+                if ($noti->readUsers) {
+                    $hiddenProducts = explode(',', $noti->readUsers);
+                    if (in_array(auth()->user()->student_id, $hiddenProducts)) {
+                        $total2 = $total2 + 0;
+                    } else {
+                        $total2 = $total2 + 1;
+                        $items2[] = $noti->assigment_id;
+                    }
+                } else {
+                    $total2 = $total2 + 1;
+                    $items2[] = $noti->assigment_id;
+                }
+            }
+        }
+        $assignmentnotifications = $total2;
+        $assignNotificationData = $items2;
         if ($unitNames) {
             foreach ($unitNames as $u_name) {
                 $topics_get = Topic::where('institute_assigned_class_subject_id', request()->iacs)
@@ -152,8 +177,13 @@ class StudentController extends Controller
                     ->where('unit', $u_name->id)
                     ->orderBy('publish_date', 'desc')
                     ->get();
-                if (!empty($topics_get) && count($topics_get) > 0) {
-                    foreach ($topics_get as $topic) {
+                    if (!empty($topics_get) && count($topics_get) > 0) {
+                        foreach ($topics_get as $topic) {
+                        if (in_array($topic->id, $assignNotificationData)){
+                            $topic->showRibbon = true;
+                        }else{
+                            $topic->showRibbon = false;
+                        }
                         $qu_count = 0;
                         foreach ($questions as $question) {
                             if ($question->topic_id == $topic->id) {
@@ -168,24 +198,7 @@ class StudentController extends Controller
                     $topics[] = $unitName;
                 }
             }
-            $old_data = DB::table('class_notifications')
-                ->where('type', 'test')
-                ->where('i_a_c_s_id', request()->iacs)
-                ->get();
-            if ($old_data) {
-                foreach ($old_data as $dat) {
-                    $old_data_arr = !empty($dat->readUsers) ? explode(',', $dat->readUsers) : [];
-                    if (!in_array(auth()->user()->student_id, $old_data_arr)) {
-                        $old_data_arr[] = auth()->user()->student_id;
-                        $query = DB::table('class_notifications')
-                            ->where('id', $dat->id)
-                            ->where('notify_date', '<=', date('Y-m-d'))
-                            ->update([
-                                'readUsers' => implode(',', $old_data_arr),
-                            ]);
-                    }
-                }
-            }
+          
         }
 
 
@@ -373,7 +386,7 @@ class StudentController extends Controller
             $videoClass = unserialize($videoClass);
             $vid = $videoClass[0];
         }
-        $notifications = ClassNotification::where('i_a_c_s_id', request()->iacs)->where('isread', 1)->where('type', 'text')->get();
+        $notifications = ClassNotification::where('i_a_c_s_id', request()->iacs)->where('isread', 1)->where('type', 'text')->orwhere('type', 'pdf')->get();
         $total = 0;
         if (!empty($notifications)) {
             foreach ($notifications as $noti) {
@@ -768,6 +781,21 @@ class StudentController extends Controller
                 return response()->json(['status' => 200, 'lecture_status' => 'completed']);
             }
         }
+        $old_data = DB::table('class_notifications')->where('class_id', $lecture_id)->where('type', 'extraClass')->where('i_a_c_s_id', request()->iacs_id)->whereDate('notify_date', '<=', date('Y-m-d'))->get(); 
+        if ($old_data) {
+            $items2 = [];
+            foreach ($old_data as $dat) {
+                $old_data_arr = !empty($dat->readUsers) ? explode(',', $dat->readUsers) : [];
+                if (!in_array(auth()->user()->student_id, $old_data_arr)) {
+                    $items2[] = $dat->class_id ? $dat->class_id : '';
+                    $old_data_arr[] = auth()->user()->student_id;
+                    $query =
+                        DB::table('class_notifications')->where('class_id', $lecture_id)->where('type', 'extraClass')->where('i_a_c_s_id', request()->iacs_id)->whereDate('notify_date', '<=', date('Y-m-d'))->update([
+                            'readUsers' => implode(',', $old_data_arr),
+                        ]);
+                }
+            }
+        }
 
         \App\Models\StudentLecture::create([
             'student_id' => auth()->user()->student_id,
@@ -965,17 +993,33 @@ class StudentController extends Controller
         ];
         $lectureAll = [];
         $lectureArr = [];
+        $old_data = DB::table('class_notifications')->where('type', 'extraClass')->where('i_a_c_s_id', request()->iacs_id)->whereDate('notify_date', '<=', date('Y-m-d'))->get();
+        if ($old_data) {
+            $items2 = [];
+            foreach ($old_data as $dat) {
+                $old_data_arr = !empty($dat->readUsers) ? explode(',', $dat->readUsers) : [];
+                if (!in_array(auth()->user()->student_id, $old_data_arr)) {
+                    $items2[] = $dat->class_id ? $dat->class_id : ''; 
+                }
+            }
+        }
         if (request()->iacs_id) {
             $extra_classesGroupedByUnits = \App\Models\Unit::with('extra_classes')->where('institute_assigned_class_subject_id', request()->iacs_id)->get();
             foreach ($extra_classesGroupedByUnits as $key => $unit) {
                 if ($unit->extra_classes->count() > 0) {
                     $lects = [];
                     if (!empty($unit->extra_classes)) {
-                        foreach ($unit->extra_classes as $qq) {
+                        foreach ($unit->extra_classes as $qq) { 
+                            if(in_array($qq->id, $items2)){
+                                $showStrip = true;
+                            } else{
+                                $showStrip = false;
+                            }
                             $lects[] = ([
                                 'id' => $qq->id,
                                 'institute_assigned_class_subject_id' => $qq->institute_assigned_class_subject_id,
                                 'unit_id' => $qq->unit_id,
+                                'showStrip' => $showStrip,
                                 'extra_class_number' => $qq->extra_class_number,
                                 'extra_class_name' => $qq->extra_class_name,
                                 'extra_class_video' => !empty($qq->extra_class_video) && @unserialize($qq->extra_class_video) == true ? unserialize($qq->extra_class_video)[0] : '',
@@ -991,7 +1035,7 @@ class StudentController extends Controller
             }
         }
 
-        $old_data = DB::table('class_notifications')->where('type', 'extraClass')->where('i_a_c_s_id', request()->iacs_id)->whereDate('notify_date', '<=', date('Y-m-d'))->get();
+        /* $old_data = DB::table('class_notifications')->where('type', 'extraClass')->where('i_a_c_s_id', request()->iacs_id)->whereDate('notify_date', '<=', date('Y-m-d'))->get();
         if ($old_data) {
             $items2 = [];
             foreach ($old_data as $dat) {
@@ -1005,7 +1049,7 @@ class StudentController extends Controller
                         ]);
                 }
             }
-        }
+        } */
         return response()->json([
             'status' => 200,
             'lecturesGroupedByUnits' => $lectureAll,
@@ -1218,6 +1262,11 @@ class StudentController extends Controller
                         $qu_count = 0;
                         $isansred = false;
                         $answered_count = 0;
+                        if (in_array($topic->id, $assignNotificationData)){
+                            $topic->showRibbon = true;
+                        }else{
+                            $topic->showRibbon = false;
+                        }
                         foreach ($topic->questions as $question) {
                             if ($question->topic_id == $topic->id) {
                                 $qu_count++;
@@ -1259,7 +1308,7 @@ class StudentController extends Controller
                 $oldUnit->questions = \App\Models\Question::where('topic_id', $oldUnit->id)->get();
             }
         }
-        $old_data = DB::table('class_notifications')
+       /*  $old_data = DB::table('class_notifications')
             ->where('type', 'assignment')
             ->where('i_a_c_s_id', request()->iacs_id)
             ->get();
@@ -1276,7 +1325,7 @@ class StudentController extends Controller
                         ]);
                 }
             }
-        }
+        } */
         return response()->json([
             'status' => 200,
             'topics' => $topics,
@@ -1372,9 +1421,27 @@ class StudentController extends Controller
     public function startassignment()
     {
         $id = request()->assignment;
-        $topic = Topic::findOrFail($id);
+        $topic = Topic::findOrFail($id); 
         $auth = auth()->user();
         $auth->id = $auth->student_id;
+        $old_data = DB::table('class_notifications')
+        ->where('type', $topic->type)
+        ->where('assigment_id', $id)
+        ->get();
+        if (!empty($old_data)) { 
+            foreach ($old_data as $dat) { 
+                $old_data_arr = !empty($dat->readUsers) ? explode(',', $dat->readUsers) : [];
+                if (!in_array(auth()->user()->student_id, $old_data_arr)) {
+                    $old_data_arr[] = auth()->user()->student_id;
+                    $query = DB::table('class_notifications')
+                        ->where('id', $dat->id)
+                        ->where('notify_date', '<=', date('Y-m-d'))
+                        ->update([
+                            'readUsers' => implode(',', $old_data_arr),
+                        ]);
+                }
+            }
+        }
         if ($auth) {
             if ($answers = \App\Models\Answer::where('user_id', $auth->id)->get()) {
                 $all_questions = collect();

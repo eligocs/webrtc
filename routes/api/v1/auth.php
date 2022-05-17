@@ -55,6 +55,7 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get('profile', 'Api\v1\Front\InstituteController@profile');
         Route::post('getStudentSubjects', 'Api\v1\Front\InstituteController@getStudentSubjects');
         Route::post('getstudentAttendance', 'Api\v1\Front\InstituteController@getstudentAttendance');
+        Route::post('create_notification', 'Api\v1\Front\InstituteController@create_notification');
 
         //student
         Route::post('getstudentsubject', 'Api\v1\Front\StudentController@getstudentsubject');

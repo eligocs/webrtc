@@ -761,7 +761,7 @@ class StudentController extends Controller
 
             $total4 = 0;
             $items4 = [];
-            $extranotifications =  ClassNotification::where('i_a_c_s_id', request()->iacs_id)->whereDate('notify_date', '=', date('Y-m-d'))->where('type', 'extraClass')->get();
+            $extranotifications =  ClassNotification::where('i_a_c_s_id', request()->iacs_id)->whereDate('notify_date', '<=', date('Y-m-d'))->where('type', 'extraClass')->get();
             if (!empty($extranotifications)) {
                 foreach ($extranotifications as $noti) {
                     if ($noti->readUsers) {
