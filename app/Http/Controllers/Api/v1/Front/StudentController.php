@@ -285,6 +285,8 @@ class StudentController extends Controller
     {
         $iacs = \App\Models\InstituteAssignedClassSubject::findOrFail(request()->iacs);
         $iac = $iacs->institute_assigned_class;
+        $ins =  \App\Models\Institute::where('id',$iac->institute_id)->first();
+       // return $iac;
         $syllabus = $iacs->syllabus ?? '';
         $videoClass = $iacs->video ?? '';
         $getSubjectsInfo = \App\Models\SubjectsInfo::where('institute_assigned_class_subject_id', request()->iacs)->get();
@@ -550,6 +552,7 @@ class StudentController extends Controller
             'extranotifications' => $extranotifications,
             'next_class' => $next_class,
             'student_subjects_info_id' => $student_subjects_info_id,
+            'description' => !empty($ins->description) && $ins->videoApproval == 1 ? $ins->description:''
         ]);
     }
 
@@ -1626,11 +1629,14 @@ class StudentController extends Controller
     {
 
         $id = request()->iacs;
-        $notifications = ClassNotification::where('i_a_c_s_id', $id)->where('isread', 1)->where('type', 'text')->orderBy('created_at', 'desc')->get();
+        $notifications = ClassNotification::where('i_a_c_s_id', $id)->where('isread', 1)->where('type', 'text')->orwhere('type', 'pdf')->orderBy('created_at', 'desc')->get();
         $total = 0;
         $items = [];
         if (!empty($notifications)) {
             foreach ($notifications as $noti) {
+                if($noti->type == 'pdf'){
+                    $noti->message = !empty($noti->message) && @unserialize($noti->message) == true ? unserialize($noti->message)[0] :'';
+                }
                 if ($noti->readUsers) {
                     $hiddenProducts = explode(',', $noti->readUsers);
                     if (in_array(auth()->user()->student_id, $hiddenProducts)) {

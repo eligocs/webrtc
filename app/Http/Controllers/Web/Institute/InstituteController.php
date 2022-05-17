@@ -122,7 +122,6 @@ class InstituteController extends Controller
         if (request()->hasFile('video')) {   
             $syllabus_val = '';
             $folderName = '/institutes/subjectvideo' . '/' . auth()->user()->institute_id . '/' . request()->institute_assigned_class . '/' . request()->iacs_id;
-            dd($folderName);
             $folder = createFolder($folderName);
             $fileData = request()->file('video');
             $file = createUrlsession($fileData, $folder);
@@ -348,6 +347,7 @@ class InstituteController extends Controller
         request()->validate([
             "syllabus" => "required|mimes:pdf|max:10000",
         ]);
+       
         if (request()->hasFile('syllabus')) {
             /*  $file = request()->file('syllabus');
         $syllabus_name = uniqid() . '-' . $file->getClientOriginalName();

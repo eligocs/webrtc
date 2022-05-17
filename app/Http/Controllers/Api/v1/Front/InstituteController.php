@@ -1916,19 +1916,19 @@ class InstituteController extends Controller
     {
         request()->validate([
             "syllabus" => "required|mimes:pdf|max:10000",
-        ]);
-        $iacs = \App\Models\InstituteAssignedClassSubject::findOrFail(request()->iacs_id);
+        ]); 
+        $iacs = \App\Models\InstituteAssignedClassSubject::findOrFail(request()->i_assigned_class_subject_id);
         $iac = $iacs->institute_assigned_class;
         $class_id = $iac->id;
         if (request()->hasFile('syllabus')) {
             $syllabus_val = '';
-            $folderName = '/institutes/syllabus' . '/' . auth()->user()->institute_id . '/' . $class_id . '/' . request()->iacs_id;
+            $folderName = '/institutes/syllabus' . '/' . auth()->user()->institute_id . '/' . $class_id . '/' . request()->i_assigned_class_subject_id;
             $folder = createFolder($folderName);
             $fileData = request()->file('syllabus');
             $file = createUrlsession($fileData, $folder);
             if (!empty($file) && $file != 400) {
                 $syllabus_val = serialize($file);
-                $res = \App\Models\InstituteAssignedClassSubject::where('id', request()->iacs_id)->update(['syllabus' => $syllabus_val]);
+                $res = \App\Models\InstituteAssignedClassSubject::where('id', request()->i_assigned_class_subject_id)->update(['syllabus' => $syllabus_val]);
                 return response()->json([
                     'status' => 200,
                     'msg' => 'Syllabus updated successfully',
@@ -1975,5 +1975,36 @@ class InstituteController extends Controller
             'status' => 400,
             'msg' => 'Please select proper video format file !!!',
         ]);
+    }
+
+
+    public function create_notification(Request $request)
+    {  
+        $i_assigned_class = request()->i_assigned_class;
+        $institute_class_subject = request()->i_assigned_class_subject_id;
+        if (request()->hasFile('syllabus')) {
+            $folderName = 'institutes/notification'. '/'.auth()->user()->institute_id . '/' . $i_assigned_class . '/' .$institute_class_subject; 
+            $folder = createFolder($folderName);
+            $fileData = request()->file('syllabus');
+            $file = createUrlsession($fileData, $folder);
+            $file_name = '';
+            if (!empty($file) && $file != 400) {
+                $file_name = serialize($file);
+            } 
+            $query = \App\Models\ClassNotification::create([
+                'i_a_c_s_id' => $request->i_assigned_class_subject_id,
+                'type' => 'pdf',
+                'message' => $file_name,
+            ]);
+            return response()->json([
+                'status' => 200,
+                'msg' => 'Notification sent',
+            ]);  
+        }else{
+            return response()->json([
+                'status' => 400,
+                'msg' => 'Failed to send notifications !!!',
+            ]);  
+        }
     }
 }
