@@ -40,6 +40,15 @@
                 0 => '*',
             ),
         ),
+        'davejamesmiller/laravel-breadcrumbs' => array(
+            'pretty_version' => '5.3.2',
+            'version' => '5.3.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../davejamesmiller/laravel-breadcrumbs',
+            'aliases' => array(),
+            'reference' => '99f92a706faefb5e1816caa96e877a0184509e5b',
+            'dev_requirement' => false,
+        ),
         'defuse/php-encryption' => array(
             'pretty_version' => 'v2.3.1',
             'version' => '2.3.1.0',
@@ -146,7 +155,7 @@
             'install_path' => __DIR__ . '/../facade/ignition-contracts',
             'aliases' => array(),
             'reference' => '3c921a1cdba35b68a7f0ccffc6dffc1995b18267',
-            'dev_requirement' => true,
+            'dev_requirement' => false,
         ),
         'fakerphp/faker' => array(
             'pretty_version' => 'v1.19.0',
