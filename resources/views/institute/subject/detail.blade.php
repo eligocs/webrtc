@@ -132,8 +132,8 @@ i.fa.fa-edit {
                         <i class="fa fa-edit   "    onclick="$('#syllabus').trigger('click');"></i>
                     {{-- <a href="" class=" green-gradient w-30 text-center btn-style text-white mr-1">Add Demo</a> --}}
                     {{-- <a href="" class=" blue-gradient w-30 text-center btn-style text-white">Switch Institute</a> --}}
-                </div>  
-                <div class='text-center text-orange'>{{empty($iacs->videoApproval) && $iacs->videoApproval == 0 ? 'Content Under Approval': ''}}</div>
+                </div>   
+                <div class='text-center text-orange'>{{!empty($iacs->video) && $iacs->videoApproval == 0 ? 'Content Under Approval': ''}}</div>
             </div>
         </div>
     </div>

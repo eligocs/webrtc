@@ -76,7 +76,7 @@ class NotificationSender
             return $this->queueNotification($notifiables, $notification);
         }
 
-        return $this->sendNow($notifiables, $notification);
+        $this->sendNow($notifiables, $notification);
     }
 
     /**
@@ -162,6 +162,11 @@ class NotificationSender
      */
     protected function shouldSendNotification($notifiable, $notification, $channel)
     {
+        if (method_exists($notification, 'shouldSend') &&
+            $notification->shouldSend($notifiable, $channel) === false) {
+            return false;
+        }
+
         return $this->events->until(
             new NotificationSending($notifiable, $notification, $channel)
         ) !== false;
@@ -192,11 +197,23 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
+                $queue = $notification->queue;
+
+                if (method_exists($notification, 'viaQueues')) {
+                    $queue = $notification->viaQueues()[$channel] ?? null;
+                }
+
+                $delay = $notification->delay;
+
+                if (method_exists($notification, 'withDelay')) {
+                    $delay = $notification->withDelay($notifiable, $channel) ?? null;
+                }
+
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($notification->connection)
-                            ->onQueue($notification->queue)
-                            ->delay($notification->delay)
+                            ->onQueue($queue)
+                            ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
                             ->through(
                                 array_merge(
                                     method_exists($notification, 'middleware') ? $notification->middleware() : [],

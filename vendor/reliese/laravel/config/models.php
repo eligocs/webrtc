@@ -323,6 +323,26 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Model Names
+        |--------------------------------------------------------------------------
+        |
+        | By default the generator will create models with names that match your tables.
+        | However, if you wish to manually override the naming, you can specify a mapping
+        | here between table and model names.
+        |
+        | Example:
+        |   A table called 'billing_invoices' will generate a model called `BillingInvoice`,
+        |   but you'd prefer it to generate a model called 'Invoice'. Therefore, you'd add
+        |   the following array key and value:
+        |     'billing_invoices' => 'Invoice',
+        */
+
+        'model_names' => [
+
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Relation Name Strategy
         |--------------------------------------------------------------------------
         |
@@ -333,14 +353,19 @@ return [
                             generates Post::user() and User::posts()
         |
         | 'foreign_key' Use the foreign key as the relation name.
-        |                   (post.author --> user.id)
-        |                       generates Post::author() and User::posts_author()
-        |               Column id's are ignored.
+        |               This can help to provide more meaningful relationship names, and avoids naming conflicts
+        |               if you have more than one relationship between two tables.
         |                   (post.author_id --> user.id)
+        |                       generates Post::author() and User::posts_where_author()
+        |                   (post.editor_id --> user.id)
+        |                       generates Post::editor() and User::posts_where_editor()
+        |               ID suffixes can be omitted from foreign keys.
+        |                   (post.author --> user.id)
+        |                   (post.editor --> user.id)
         |                       generates the same as above.
-        |               When the foreign key is redundant, it is omited.
+        |               Where the foreign key matches the related table name, it behaves as per the 'related' strategy.
         |                   (post.user_id --> user.id)
-        |                       generates User::posts() and not User::posts_user()
+        |                       generates Post::user() and User::posts()
         */
 
         'relation_name_strategy' => 'related',
@@ -387,6 +412,27 @@ return [
         'override_pluralize_for' => [
 
         ],
+        /*
+        |--------------------------------------------------------------------------
+        | Move $fillable property to base files
+        |--------------------------------------------------------------------------
+        | When base_files is true you can set fillable_in_base_files to true 
+        | if you want the $fillable to be generated in base files
+        |
+        */
+        'fillable_in_base_files' => false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate return types for relation methods.
+        |--------------------------------------------------------------------------
+        | When enable_return_types is set to true, return type declarations are added
+        | to all generated relation methods for your models.
+        |
+        | NOTE: This requires PHP 7.0 or later.
+        |
+        */
+        'enable_return_types' => false,
     ],
 
     /*
@@ -417,4 +463,44 @@ return [
     //         'use' => [],
     //     ]
     // ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Connection Specifics
+    |--------------------------------------------------------------------------
+    |
+    | In this section you may define the default configuration for each model
+    | that will be generated from a specific connection. You can also nest
+    | database and table specific configurations.
+    |
+    | You may wish to use connection specific config for setting a parent
+    | model with a read only setup, or enforcing a different set of rules
+    | for a connection, e.g. using snake_case naming over CamelCase naming.
+    |
+    | This supports nesting with the following key configuration values, in
+    | reverse precedence order (i.e. the last one found becomes the value).
+    |
+    |       connections.{connection_name}.property
+    |       connections.{connection_name}.{database_name}.property
+    |       connections.{connection_name}.{table_name}.property
+    |       connections.{connection_name}.{database_name}.{table_name}.property
+    |
+    | These values will override those defined in the section above.
+    |
+    */
+
+//    'connections' => [
+//        'read_only_external' => [
+//            'parent' => \App\Models\ReadOnlyModel::class,
+//            'connection' => true,
+//            'users' => [
+//                'connection' => false,
+//            ],
+//            'my_other_database' => [
+//                'password_resets' => [
+//                    'connection' => false,
+//                ]
+//            ]
+//        ],
+//    ],
 ];

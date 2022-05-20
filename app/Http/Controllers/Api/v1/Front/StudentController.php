@@ -245,9 +245,8 @@ class StudentController extends Controller
                 $class->institute_details = \App\Models\Institute::where('id', $class->institute_id)->first();
                 $class->language = \App\Models\Language::where('id', $class->language)->first();
                 $subjects = \App\Models\InstituteAssignedClassSubject::where('institute_assigned_class_id', $class->id)->get();
-                if ($class->freetrial == 1) {
-                    $classStatus = 'Free Trial';
-                } elseif (\App\Models\InstituteAssignedClassStudent::where([
+               
+                if (\App\Models\InstituteAssignedClassStudent::where([
                     'institute_assigned_class_id' =>
                     $class->id,
                     'student_id' => auth()->user()->student_id
@@ -296,7 +295,7 @@ class StudentController extends Controller
     }
     public function loadstudentdata(Request $request)
     {
-        $iacs = \App\Models\InstituteAssignedClassSubject::findOrFail(request()->iacs);
+        $iacs = \App\Models\InstituteAssignedClassSubject::findOrFail(request()->iacs); 
         $iac = $iacs->institute_assigned_class;
         $ins =  \App\Models\Institute::where('id',$iac->institute_id)->first();
        // return $iac;
@@ -487,7 +486,7 @@ class StudentController extends Controller
             }
         }
         $extranotifications = $total4;
-        $institute_assigned_class_subject = DB::table('institute_assigned_class_subject')->where('id', request()->iacs_id)->first();
+        $institute_assigned_class_subject = DB::table('institute_assigned_class_subject')->where('id', request()->iacs)->first();
         if (!empty($institute_assigned_class_subject)) {
             $institute_assigned_class_student = DB::table('institute_assigned_class_student')->where('institute_assigned_class_id', $institute_assigned_class_subject->institute_assigned_class_id)->where('student_id', auth()->user()->student_id)->first();
             if (!empty($institute_assigned_class_student) && !empty($institute_assigned_class_student->end_date)) {
@@ -537,14 +536,18 @@ class StudentController extends Controller
                     $correct = 0;
                     $total_marks = 0;
                 }
-            }
-            $toatalmarks = 0;
-            if ($total_marks > 0) {
-                $toatalmarks = $correct . '/' . $total_marks;
+                $toatalmarks = 0;
+                if ($total_marks > 0) {
+                    $toatalmarks = $correct . '/' . $total_marks;
+                }
             }
         }
+        $class_Sublect = DB::table('institute_assigned_class_subject')->where('id', request()->iacs)->first();
+        $mode = \App\Models\InstituteAssignedClassStudent::where('student_id',  auth()->user()->student_id)
+            ->where('institute_assigned_class_id', $class_Sublect->institute_assigned_class_id)->first();
         return response()->json([
             'status' => 200,
+            'mode_of_class' => $mode->mode_of_class ?? '',
             'total_attempted' => $total_attempted ?? 0,
             'total_unattempted' => $total_unattempted ?? 0,
             'toatalmarks' => $toatalmarks ?? 0,
@@ -611,6 +614,7 @@ class StudentController extends Controller
 
     public function enrollthisclass(Request $request)
     {
+      
         $isfreetrial = false;
         if (!empty(request()->freetrial) && request()->freetrial == 1) {
             $isfreetrial = true;
@@ -646,7 +650,8 @@ class StudentController extends Controller
             'sea-gradient',
             'purple-gradient',
         ];
-
+        
+         
         $class = \App\Models\InstituteAssignedClass::with('institute_assigned_class_subject.subjects_infos.student_subjects_info.time_slot')->find(request()->class_id);
         $subjects = [];
         $instdata = \App\Models\Institute::where('id', $class->institute_id)->first();
@@ -664,7 +669,7 @@ class StudentController extends Controller
             'student_id' => auth()->user()->student_id,
             'class_id' => request()->class_id,
             'row' => request()->slotsarr,
-            'mode_of_class' => '2'
+            'mode_of_class' => request()->class_mode
         ]);
         //return view('student.checkout', ['classes' => Arr::wrap($class), 'colors' => $colors, 'data' => request()->all(), 'isfreetrial' => $isfreetrial]);
         return response()->json([
@@ -687,8 +692,9 @@ class StudentController extends Controller
         ]);
         $all_data = (request()->form_data);
         $session_key = (request()->session_key);
-        $form_data = $all_data[$session_key];
+        $form_data = $all_data[$session_key];  
         $coupenAppl = '';
+        
         if (!empty(request()->coupencode)) {
             $coupenAppl = $this->apply_coupon($form_data['class_id'], request()->coupencode, $form_data);
         }
@@ -725,7 +731,7 @@ class StudentController extends Controller
                         'end_date' => $end_date,
                     ]);
                 }
-                // dd($form_data->mode_of_class);
+           
                 \App\Models\StudentTrialPeriod::create([
                     'student_id' => auth()->user()->student_id,
                     'class_id' => $class->id,
@@ -739,7 +745,7 @@ class StudentController extends Controller
                     'coupon_applied' => '0',
                     'start_date' => $start_date,
                     'end_date' => $end_date,
-                    'mode_of_class' => $form_data->mode_of_class,
+                    'mode_of_class' => $form_data['mode_of_class'],
                     'coupenAppl' => $coupenAppl,
                 ]);
 
@@ -806,8 +812,7 @@ class StudentController extends Controller
         return response()->json(['status' => 200, 'lecture_status' => 'started']);
     }
     public function verifyPayment()
-    {
-
+    { 
         if (!empty(request()->razorpay_payment_id) && !empty(request()->class_id)) {
             $cart = \App\Models\Cart::where('institute_assigned_class_id', request()->class_id)->where('student_id', auth()->user()->student_id)->first();
             $requested_data = json_decode($cart->form_data);
@@ -863,7 +868,7 @@ class StudentController extends Controller
                 'razorpay_payment_id' => request()->razorpay_payment_id,
                 'coupon_id' => $coupon_id,
                 'coupon_applied' => $coupon_applied,
-                'mode_of_class' =>  '2',
+                'mode_of_class' =>  request()->class_mode,
             ]);
 
             $cart->delete();

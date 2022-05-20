@@ -45,31 +45,31 @@ class StatusCommand extends BaseCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
-        $this->migrator->setConnection($this->option('database'));
+        return $this->migrator->usingConnection($this->option('database'), function () {
+            if (! $this->migrator->repositoryExists()) {
+                $this->error('Migration table not found.');
 
-        if (! $this->migrator->repositoryExists()) {
-            $this->error('Migration table not found.');
+                return 1;
+            }
 
-            return 1;
-        }
+            $ran = $this->migrator->getRepository()->getRan();
 
-        $ran = $this->migrator->getRepository()->getRan();
+            $batches = $this->migrator->getRepository()->getMigrationBatches();
 
-        $batches = $this->migrator->getRepository()->getMigrationBatches();
-
-        if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
-            $this->table(['Ran?', 'Migration', 'Batch'], $migrations);
-        } else {
-            $this->error('No migrations found');
-        }
+            if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
+                $this->table(['Ran?', 'Migration', 'Batch'], $migrations);
+            } else {
+                $this->error('No migrations found');
+            }
+        });
     }
 
     /**
-     * Get the status for the given ran migrations.
+     * Get the status for the given run migrations.
      *
      * @param  array  $ran
      * @param  array  $batches

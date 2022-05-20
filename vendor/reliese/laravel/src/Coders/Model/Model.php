@@ -163,6 +163,11 @@ class Model
     protected $relationNameStrategy = '';
 
     /**
+     * @var bool
+     */
+    protected $definesReturnTypes = false;
+
+    /**
      * ModelClass constructor.
      *
      * @param \Reliese\Meta\Blueprint $blueprint
@@ -209,6 +214,8 @@ class Model
 
         // Relation name settings
         $this->withRelationNameStrategy($this->config('relation_name_strategy', $this->getDefaultRelationNameStrategy()));
+
+        $this->definesReturnTypes = $this->config('enable_return_types', false);
 
         return $this;
     }
@@ -292,7 +299,7 @@ class Model
         }
 
         // Track PHP type hints
-        $hint = $this->phpTypeHint($cast);
+        $hint = $this->phpTypeHint($cast, $column->nullable);
         $this->properties[$column->name] = $hint;
 
         if ($column->name == $this->getPrimaryKey()) {
@@ -333,28 +340,40 @@ class Model
 
     /**
      * @param string $castType
+     * @param bool $nullable
      *
      * @todo Make tests
      *
      * @return string
      */
-    public function phpTypeHint($castType)
+    public function phpTypeHint($castType, $nullable)
     {
+        $type = $castType;
+
         switch ($castType) {
             case 'object':
-                return '\stdClass';
+                $type = '\stdClass';
+                break;
             case 'array':
             case 'json':
-                return 'array';
+                $type = 'array';
+                break;
             case 'collection':
-                return '\Illuminate\Support\Collection';
+                $type = '\Illuminate\Support\Collection';
+                break;
             case 'date':
-                return '\Carbon\Carbon';
+                $type = '\Carbon\Carbon';
+                break;
             case 'binary':
-                return 'string';
-            default:
-                return $castType;
+                $type = 'string';
+                break;
         }
+
+        if ($nullable) {
+            return $type.'|null';
+        }
+
+        return $type;
     }
 
     /**
@@ -483,7 +502,7 @@ class Model
      */
     public function withParentClass($parent)
     {
-        $this->parentClass = $parent;
+        $this->parentClass = '\\' . ltrim($parent, '\\');
 
         return $this;
     }
@@ -509,6 +528,13 @@ class Model
      */
     public function getClassName()
     {
+        // Model names can be manually overridden by users in the config file.
+        // If a config entry exists for this table, use that name, rather than generating one.
+        $overriddenName = $this->config('model_names.' . $this->getTable());
+        if ($overriddenName) {
+            return $overriddenName;
+        }
+
         if ($this->shouldLowerCaseTableName()) {
             return Str::studly(Str::lower($this->getRecordName()));
         }
@@ -1221,5 +1247,21 @@ class Model
     public function config($key = null, $default = null)
     {
         return $this->factory->config($this->getBlueprint(), $key, $default);
+    }
+
+    /**
+     * @return bool
+     */
+    public function fillableInBaseFiles(): bool
+    {
+        return $this->config('fillable_in_base_files', false);
+    }
+
+    /**
+     * @return bool
+     */
+    public function definesReturnTypes()
+    {
+        return $this->definesReturnTypes;
     }
 }

@@ -245,7 +245,7 @@
                         inputOptions: {
                             // 'Mode of Class ': {
                             1: 'Live ',
-                            2: 'Recoded',
+                            2: 'Recorded',
                             // },
                         },
                         inputPlaceholder: 'Select Class Mode',
